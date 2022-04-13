@@ -1,0 +1,28 @@
+{
+  "scripts": {
+    "dev": "lite-server"
+  },
+  "dependencies": {
+    "@truffle/contract": "^4.5.5",
+    "bootstrap": "^5.1.3",
+    "lite-server": "^2.6.1"
+  },
+  "name": "mydapp",
+  "description": "",
+  "version": "1.0.0",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alejandro021987/MyDApp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alejandro021987/MyDApp/issues"
+  },
+  "homepage": "https://github.com/alejandro021987/MyDApp#readme"
+}
