@@ -1,11 +1,13 @@
 console.log('App tasks Running');
 App = {
     contracts: [],
-    init:() => {
+    init: async () => {
         console.log('Loaded');
-        App.LoadEthereum();
-        App.loadContracts();
-        App.loadAccount()
+        await App.LoadEthereum();
+        await App.loadContracts();
+        await App.loadAccount();
+        App.render();
+        await App.renderTask();
     },
     LoadEthereum: async () => {
         if (typeof window.ethereum !== 'undefined') {
@@ -32,11 +34,57 @@ App = {
     loadAccount: async () => {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts'});
         App.account = accounts[0];
+        console.log('ACCOUNT: ' + App.account );
+    },
+
+    render: () => {
+        document.getElementById("account").innerText = App.account;
+    },
+
+    renderTask: async () => {
+        const taskCounter = await App.tasksContract.nextId();
+        console.log(taskCounter.toNumber());
+        let html = '';
+        for (let i = 1; i < taskCounter.toNumber(); i++) {
+            const task = await App.tasksContract.tasks(i);
+            const taskId = task[0];
+            const taskTitle = task[1];
+            const taskDescription = task[2];
+            const taskDone = task[3];
+            const taskCreated = task[4];
+            let taskElement = `
+                <div class="card bg-dark rounded-0 mb-0">            
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>${taskTitle}</span>
+                        <div class="form-check form-switch ">
+                        <input class="form-check-input" data-id="${taskId}" type="checkbox" ${taskDone && "checked" }
+                         onchange="App.toggleDone(this)" />
+                        </div>
+                    </div>
+                    <div>
+                        <span>${taskDescription}</span>
+                        <p class="text-muted">Task was created ${ new Date(taskCreated * 1000).toLocaleString() }</p>
+                    </div>
+                </div>
+            `;
+            html += taskElement;
+        };
+
+        document.querySelector('#tasksList').innerHTML = html;
     },
 
     createTask: async (title, description) => {
         const result = await App.tasksContract.createTask(title, description, { from: App.account});
         console.log(result.logs[0].args);
+    }, 
+
+    toggleDone: async (element) => {
+        console.log(element.dataset.id);
+        const taskId = element.dataset.id;
+        await App.tasksContract.toggleDone(taskId, {
+            from: App.account
+        });
+        window.location.reload();
     }
 }
 
